@@ -17,14 +17,19 @@ class DAG:
     Some bullshit
     """
     
-    __slots__ = ['graph', 'name', '_old_context_manager_dag', 'root']
+    __slots__ = ['graph', 'name', '_old_context_manager_dag']
     def __init__(self, name: str = 'dag') -> None:
         """ Constructor for DAG """
         self.graph = nx.DiGraph()
         self.name = name
 
+    @property
+    def root(self) -> 'Job':
+        return [n for n,d in self.graph.in_degree() if d==0][0]
+
+
     def __repr__(self) -> str:
-        return self.name
+        return f'{self.name}'
 
     def __enter__(self):
         # insipired by airflow's implementation (https://github.com/apache/airflow/blob/1.10.2/airflow/models.py#L3456-L3468)
@@ -64,7 +69,7 @@ class DAG:
         pass
 
     def _create_dag_positions(self):
-        starting_node = [n for n,d in self.graph.in_degree() if d==0][0]
+        starting_node = self.root
         levels = nx.single_source_dijkstra_path_length(self.graph, starting_node)
         
         #print(levels)
