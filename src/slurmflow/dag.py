@@ -1,8 +1,11 @@
 import subprocess
 from typing import Iterable, Union
 from matplotlib import pyplot as plt
+from collections import Counter
+import numpy as np
 import networkx as nx
-from networkx.drawing.nx_agraph import graphviz_layout
+
+#from .'Job' import 'Job'
 
 
 _CONTEXT_MANAGER_DAG = None
@@ -34,13 +37,13 @@ class DAG:
         global _CONTEXT_MANAGER_DAG
         _CONTEXT_MANAGER_DAG = self._old_context_manager_dag
 
-    def set_children(self, root: 'Node', children: Iterable) -> None:
+    def set_children(self, root: 'Job', children: Iterable) -> None:
         self._set_relationship(root, children, forward=True)
 
-    def set_parents(self, root: 'Node', parents: Iterable) -> None:
+    def set_parents(self, root: 'Job', parents: Iterable) -> None:
         self._set_relationship(root, parents, forward=False)
 
-    def _set_relationship(self, root: 'Node', rel: Union[str, Iterable], forward=True) -> None:
+    def _set_relationship(self, root: 'Job', rel: Union[str, Iterable], forward=True) -> None:
         try:
             rel_list = list(rel)
         except TypeError:
@@ -60,16 +63,43 @@ class DAG:
     def submit_DAG(self) -> None:
         pass
 
-
+    def _create_dag_positions(self):
+        starting_node = [n for n,d in self.graph.in_degree() if d==0][0]
+        levels = nx.single_source_dijkstra_path_length(self.graph, starting_node)
         
+        #print(levels)
+        level_counts = Counter(levels.values())
+        level_decrement = level_counts.copy()
+        pos_mapping = dict()
+        for k, v in levels.items():
+            count = level_counts[v]
+            if count == 1:
+                pos_mapping[k] = (v, 0)
+                #print(k, v, 0)
+            else:
+                bound = level_counts[v] // 2
+                y_min, y_max = -bound, bound
+                arr = np.linspace(y_min, y_max, level_counts[v])
+                level_decrement[v] -= 1
+                cur = level_decrement[v]
+                scaled_val = arr[cur]
+                pos_mapping[k] = (v, scaled_val)
+                #print(k, v, scaled_val)
+        return pos_mapping
 
     def plot_DAG(self) -> None:
         plt.figure(figsize=(15, 10))
         degree = nx.degree(self.graph)
-        print(degree)
-        node_sizes = [v[1] * 75 for v in degree]
-        nx.draw(self.graph, arrows=True, node_size=node_sizes, layout=nx.layout.spectral_layout(self.graph), node_color='cadetblue')
+        #print(degree)
+        pos = self._create_dag_positions()
+        node_size=[len(v.name) * 400 for v in self.graph.nodes()]
+        nx.draw_networkx(self.graph, pos=pos,node_size=node_size, \
+             arrows=True, node_color='cadetblue')
         plt.title(f'DAG representation of {self.name}')
+        ax = plt.gca()
+        ax.axes.xaxis.set_visible(False)
+        ax.axes.yaxis.set_visible(False)
+        plt.grid(True)
         plt.show()
     
 
