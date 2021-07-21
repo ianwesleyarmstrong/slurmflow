@@ -32,7 +32,7 @@ jobs:
       - name: "Installs and upgrades pip, installs other dependencies and installs the package from setup.py"
         run: |
           # Upgrade pip
-          python3 -m pip install --upgrade pip 
+          python3 -m pip install --upgrade pip build
           # Install build deps
           python3 -m pip install setuptools wheel twine
           # If requirements.txt exists, install from it
