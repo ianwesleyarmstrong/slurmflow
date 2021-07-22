@@ -23,8 +23,12 @@ class DAG:
         self.name = name
 
     @property
-    def root(self) -> 'Job':
+    def source(self) -> 'Job':
         return [n for n, d in self.graph.in_degree() if d == 0][0]
+
+    @property
+    def sink(self) -> 'Job':
+        return [n for n, d in self.graph.out_degree() if d == 0][0]
 
     def __repr__(self) -> str:
         return f'{self.name}'
@@ -62,24 +66,38 @@ class DAG:
 
     def run(self) -> None:
         # find way to extend environment variables in DAG
-        for node in self.graph.nodes():
-            # job has upstream dependencies
-            upstream = node.upstream_jobs
-            if upstream:
-                upstream_ids = []
-                print(f'Current node {node}, upstream {upstream}')
-                for job in upstream:
-                    if not job.id:
-                        upstream_job_id = job.submit()
-                        print(node.name, upstream_job_id)
-                        upstream_ids.append(upstream_job_id)
-                    else:
-                        upstream_ids.append(job.id)
-                # dependencies have been resolved
-                node.submit(upstream_ids)
-            else:
-                # no job dependencies
-                node.submit()
+        # for node in self.graph.nodes():
+        #     # job has upstream dependencies
+        #     upstream = node.upstream_jobs
+        #     if upstream:
+        #         upstream_ids = []
+        #         print(f'Current node {node}, upstream {upstream}')
+        #         for job in upstream:
+        #             print(job.id)
+        #             if not job.id:
+        #                 upstream_job_id = job.submit()
+        #                 print(node.name, upstream_job_id)
+        #                 upstream_ids.append(upstream_job_id)
+        #             else:
+        #                 upstream_ids.append(job.id)
+        #         # dependencies have been resolved
+        #         node.submit(upstream_ids)
+        #     else:
+        #         # no job dependencies
+        #         node.submit()
+        self._run(self.sink)
+
+    def _run(self, node: 'Job'):
+        up_jobs = node.upstream_jobs
+        if not up_jobs:
+            node.submit()
+        else:
+            up_ids = []
+            for up_job in up_jobs:
+                if not up_job.id:
+                    self._run(up_job)
+                up_ids.append(up_job.id)
+            node.submit(up_ids)
 
     def _create_dag_positions(self):
         starting_node = self.root
