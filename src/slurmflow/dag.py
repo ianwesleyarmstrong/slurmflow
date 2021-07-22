@@ -24,7 +24,7 @@ class DAG:
 
     @property
     def source(self) -> 'Job':
-        return [n for n, d in self.graph.in_degree() if d == 0][0]
+        return [n for n, d in self.graph.in_degree() if d == 0]
 
     @property
     def sink(self) -> 'Job':
@@ -99,10 +99,25 @@ class DAG:
                 up_ids.append(up_job.id)
             node.submit(up_ids)
 
+    def _find_paths(self):
+        # created to handle edge case where two nodes are the starting point
+        start = self.source
+        path_dict = {}
+        if type(start) == list:
+            for node in start:
+                levels = nx.single_source_shortest_path_length(self.graph,
+                                                               node)
+                path_dict.update(levels)
+        else:
+            path_dict = nx.single_source_shortest_path_length(self.graph,
+                                                              start)
+        return path_dict
+
+
+
     def _create_dag_positions(self):
-        starting_node = self.source
-        levels = nx.single_source_dijkstra_path_length(self.graph,
-                                                       starting_node)
+        levels = self._find_paths()
+        print(levels)
         level_counts = Counter(levels.values())
         level_decrement = level_counts.copy()
         pos_mapping = dict()
@@ -118,6 +133,7 @@ class DAG:
                 cur = level_decrement[v]
                 scaled_val = arr[cur]
                 pos_mapping[k] = (v, scaled_val)
+        print(pos_mapping)
         return pos_mapping
 
     def plot(self) -> None:
