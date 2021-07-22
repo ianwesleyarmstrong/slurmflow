@@ -73,7 +73,7 @@ class DAG:
                 for job in upstream:
                     if not job.id:
                         upstream_job_id = job.submit()
-                        print(node.name, upstream_job_id)
+                        #print(node.name, upstream_job_id)
                         upstream_ids.append(upstream_job_id)
                     else:
                         upstream_ids.append(job.id)
