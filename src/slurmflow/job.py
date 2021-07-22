@@ -1,7 +1,8 @@
 import subprocess
 from .dag import DAG
-from .global_vars import _CONTEXT_MANAGER_DAG
 from typing import List
+
+_CONTEXT_MANAGER_DAG = None
 
 
 class Job():
