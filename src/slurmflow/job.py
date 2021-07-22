@@ -1,19 +1,22 @@
 import subprocess
-from .dag import DAG, _CONTEXT_MANAGER_DAG
+from .dag import DAG
+from .global_vars import _CONTEXT_MANAGER_DAG
 from collections import defaultdict
 from typing import Iterable, List
 
-_CONTEXT_MANAGER_DAG = None
 
 class Job():
 
     def __init__(self, name: str, script: str, dag: DAG = None) -> None:
         self.name = name
+        print(self.name)
         self.script = script
         self.id = None
         if not dag and _CONTEXT_MANAGER_DAG:
+            print('what')
             dag = _CONTEXT_MANAGER_DAG
         if dag:
+            print(self.name, 'dag assigned')
             self._dag = dag
 
     @property
@@ -70,4 +73,3 @@ class Job():
             return job_id 
         else:
             return err
-

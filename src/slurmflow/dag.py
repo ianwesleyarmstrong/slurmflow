@@ -1,17 +1,14 @@
-from asyncio.events import set_event_loop
-import subprocess
-from typing import Iterable, Union
+from .global_vars import _CONTEXT_MANAGER_DAG
+from typing import Iterable, Union, TYPE_CHECKING
 from matplotlib import pyplot as plt
 from collections import Counter
-import asyncio
 import numpy as np
 import networkx as nx
 
-#from .'Job' import 'Job'
-
-
-_CONTEXT_MANAGER_DAG = None
 plt.style.use('ggplot')
+
+if TYPE_CHECKING:
+    from slurmflow.job import Job
 
 
 class DAG:
@@ -41,10 +38,10 @@ class DAG:
         return self
 
     def __exit__(self, *args, **kwargs):
-        global _CONTEXT_MANAGER_DAG
+        global 
         _CONTEXT_MANAGER_DAG = self._old_context_manager_dag
 
-    def set_children(self, root: 'Job', children: Iterable) -> None:
+    def set_children(self, root: 'Job' , children: Iterable) -> None:
         self._set_relationship(root, children, forward=True)
 
     def set_parents(self, root: 'Job', parents: Iterable) -> None:
@@ -70,10 +67,11 @@ class DAG:
             upstream = node.upstream_jobs
             if upstream: 
                 upstream_ids = []
+                print(f'Current node {node}, upstream {upstream}')
                 for job in upstream:
                     if not job.id:
                         upstream_job_id = job.submit()
-                        #print(node.name, upstream_job_id)
+                        print(node.name, upstream_job_id)
                         upstream_ids.append(upstream_job_id)
                     else:
                         upstream_ids.append(job.id)
@@ -82,11 +80,6 @@ class DAG:
             else:
                 # no job dependencies
                 node.submit()
-
-
-
-
-
 
 
     def _create_dag_positions(self):
@@ -113,7 +106,7 @@ class DAG:
                 #print(k, v, scaled_val)
         return pos_mapping
 
-    def plot_DAG(self) -> None:
+    def plot(self) -> None:
         plt.figure(figsize=(15, 10))
         degree = nx.degree(self.graph)
         #print(degree)
