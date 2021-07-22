@@ -100,7 +100,7 @@ class DAG:
             node.submit(up_ids)
 
     def _create_dag_positions(self):
-        starting_node = self.root
+        starting_node = self.source
         levels = nx.single_source_dijkstra_path_length(self.graph,
                                                        starting_node)
         level_counts = Counter(levels.values())
