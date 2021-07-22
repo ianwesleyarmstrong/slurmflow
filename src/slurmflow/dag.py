@@ -67,7 +67,8 @@ class DAG:
         # find way to extend environment variables in DAG
         for node in self.graph.nodes():
             # job has upstream dependencies
-            if upstream := node.upstream_jobs:
+            upstream = node.upstream_jobs
+            if upstream: 
                 upstream_ids = []
                 for job in upstream:
                     if not job.id:
