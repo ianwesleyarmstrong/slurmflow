@@ -38,7 +38,7 @@ class DAG:
         return self
 
     def __exit__(self, *args, **kwargs):
-        global 
+        global _CONTEXT_MANAGER_DAG
         _CONTEXT_MANAGER_DAG = self._old_context_manager_dag
 
     def set_children(self, root: 'Job' , children: Iterable) -> None:
