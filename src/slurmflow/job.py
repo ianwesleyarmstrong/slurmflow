@@ -1,7 +1,7 @@
 import subprocess
 from .dag import DAG, _CONTEXT_MANAGER_DAG
 from collections import defaultdict
-from typing import Iterable
+from typing import Iterable, List
 
 _CONTEXT_MANAGER_DAG = None
 
@@ -55,8 +55,11 @@ class Job():
     # def __repr__(self) -> str:
     #     return f' Name: {self.name}, Script: {self.script}, ID: {self.id}, Upstream: {self.upstream_jobs}, Downstream: {self.downstream_jobs}'
 
-    def submit(self) -> str:
-        command = ['sbatch', f'--job-name={self.name}', self.job_script]
+    def submit(self, upstream_ids: List[str] = None) -> str:
+        command = ['sbatch', f'--job-name={self.name}', self.script]
+        if upstream_ids:
+            slurm_dependency = '--dependency=afterok:' + ':'.join(upstream_ids)
+            command.append(slurm_dependency)
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         out, err = p.communicate().decode('utf-8').strip()
         if out and not err:

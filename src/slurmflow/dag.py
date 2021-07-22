@@ -1,7 +1,9 @@
+from asyncio.events import set_event_loop
 import subprocess
 from typing import Iterable, Union
 from matplotlib import pyplot as plt
 from collections import Counter
+import asyncio
 import numpy as np
 import networkx as nx
 
@@ -17,7 +19,7 @@ class DAG:
     Some bullshit
     """
     
-    __slots__ = ['graph', 'name', '_old_context_manager_dag']
+    __slots__ = ['graph', 'name', '_old_context_manager_dag', '_loop']
     def __init__(self, name: str = 'dag') -> None:
         """ Constructor for DAG """
         self.graph = nx.DiGraph()
@@ -61,12 +63,30 @@ class DAG:
                 pair = (node, root)
             self.graph.add_edge(*pair)
 
-         
-        
-
-
     def submit_DAG(self) -> None:
-        pass
+        # find way to extend environment variables in DAG
+        for node in self.graph.nodes():
+            # job has upstream dependencies
+            if upstream := node.upstream_jobs:
+                upstream_ids = []
+                for job in upstream:
+                    if not job.id:
+                        upstream_job_id = job.submit()
+                        print(node.name, upstream_job_id)
+                        upstream_ids.append(upstream_job_id)
+                    else:
+                        upstream_ids.append(job.id)
+                # dependencies have been resolved
+                node.submit(upstream_ids)
+            else:
+                # no job dependencies
+                node.submit()
+
+
+
+
+
+
 
     def _create_dag_positions(self):
         starting_node = self.root
