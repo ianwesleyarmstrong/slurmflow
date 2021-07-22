@@ -63,7 +63,7 @@ class DAG:
                 pair = (node, root)
             self.graph.add_edge(*pair)
 
-    def submit_DAG(self) -> None:
+    def run(self) -> None:
         # find way to extend environment variables in DAG
         for node in self.graph.nodes():
             # job has upstream dependencies

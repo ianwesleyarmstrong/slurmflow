@@ -61,7 +61,8 @@ class Job():
             slurm_dependency = '--dependency=afterok:' + ':'.join(upstream_ids)
             command.append(slurm_dependency)
         p = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        out, err = p.communicate().decode('utf-8').strip()
+        out, err = p.communicate()
+        out, err = out.decode('utf-8').strip(), err.decode('utf-8').strip()
         if out and not err:
             job_id = out[-1] 
             self.id = job_id
