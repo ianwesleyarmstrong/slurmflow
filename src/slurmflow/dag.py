@@ -113,8 +113,6 @@ class DAG:
                                                               start)
         return path_dict
 
-
-
     def _create_dag_positions(self):
         levels = self._find_paths()
         print(levels)
