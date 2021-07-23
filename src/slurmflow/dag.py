@@ -15,12 +15,13 @@ class DAG:
     """
     Workflow wrapper
     """
-    __slots__ = ['graph', 'name', '_old_context_manager_dag']
+    __slots__ = ['graph', 'name', '_old_context_manager_dag', 'env']
 
     def __init__(self, name: str = 'dag') -> None:
         """ Constructor for DAG """
         self.graph = nx.DiGraph()
         self.name = name
+        self.env = {}
 
     @property
     def source(self) -> 'Job':
@@ -115,7 +116,7 @@ class DAG:
 
     def _create_dag_positions(self):
         levels = self._find_paths()
-        print(levels)
+        # print(levels)
         level_counts = Counter(levels.values())
         level_decrement = level_counts.copy()
         pos_mapping = dict()
@@ -131,7 +132,7 @@ class DAG:
                 cur = level_decrement[v]
                 scaled_val = arr[cur]
                 pos_mapping[k] = (v, scaled_val)
-        print(pos_mapping)
+        # print(pos_mapping)
         return pos_mapping
 
     def plot(self) -> None:
