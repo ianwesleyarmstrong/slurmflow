@@ -53,7 +53,7 @@ class Job():
         return f'{self.name}'
 
     def __repr__(self) -> str:
-        return f'{self.name}'
+        return f'{self.__class__.__name__}({self.name}, {self.script}, {self.dag})'
     # def __repr__(self) -> str:
     #     return f' Name: {self.name}, Script: {self.script}, ID: {self.id},
     #  Upstream: {self.upstream_jobs}, Downstream: {self.downstream_jobs}'
@@ -68,7 +68,8 @@ class Job():
             env_vars = [f'{k}={v}' for k, v in self._dag.env.items()]
             env_export = env_flag + ','.join(env_vars)
             command.append(env_export)
-        print(f'Sbatch command: {command}')
+        command_str = ' '.join(command)
+        print(f'Sbatch command: {command_str}')
         p = subprocess.Popen(command, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE)
         out, err = p.communicate()

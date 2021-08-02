@@ -1,8 +1,11 @@
 from typing import Iterable, Union, TYPE_CHECKING
 from matplotlib import pyplot as plt
+from matplotlib import get_backend
 from collections import Counter
 import numpy as np
 import networkx as nx
+import asyncio
+import concurrent.futures
 
 plt.style.use('ggplot')
 _CONTEXT_MANAGER_DAG = None
@@ -17,11 +20,15 @@ class DAG:
     """
     __slots__ = ['graph', 'name', '_old_context_manager_dag', 'env']
 
-    def __init__(self, name: str = 'dag') -> None:
+    def __init__(self, name: str = 'dag', env: dict = None) -> None:
         """ Constructor for DAG """
         self.graph = nx.DiGraph()
         self.name = name
-        self.env = {}
+        if env:
+            self.env = env
+        else:
+            self.env = {}
+
 
     @property
     def source(self) -> 'Job':
@@ -31,8 +38,11 @@ class DAG:
     def sink(self) -> 'Job':
         return [n for n, d in self.graph.out_degree() if d == 0][0]
 
-    def __repr__(self) -> str:
+    def __str__(self) -> str:
         return f'{self.name}'
+
+    def __repr__(self) -> str:
+        return f'{self.__class__.__name__}({self.name}, {self.env}  )'
 
     def __enter__(self):
         # insipired by airflow's implementation
@@ -67,28 +77,10 @@ class DAG:
 
     def run(self) -> None:
         # find way to extend environment variables in DAG
-        # for node in self.graph.nodes():
-        #     # job has upstream dependencies
-        #     upstream = node.upstream_jobs
-        #     if upstream:
-        #         upstream_ids = []
-        #         print(f'Current node {node}, upstream {upstream}')
-        #         for job in upstream:
-        #             print(job.id)
-        #             if not job.id:
-        #                 upstream_job_id = job.submit()
-        #                 print(node.name, upstream_job_id)
-        #                 upstream_ids.append(upstream_job_id)
-        #             else:
-        #                 upstream_ids.append(job.id)
-        #         # dependencies have been resolved
-        #         node.submit(upstream_ids)
-        #     else:
-        #         # no job dependencies
-        #         node.submit()
-        self._run(self.sink)
+        pool = concurrent.futures.ThreadPoolExecutor()
+        pool.submit(asyncio.run, self._run(self.sink))
 
-    def _run(self, node: 'Job'):
+    async def _run(self, node: 'Job'):
         up_jobs = node.upstream_jobs
         if not up_jobs:
             node.submit()
@@ -96,7 +88,7 @@ class DAG:
             up_ids = []
             for up_job in up_jobs:
                 if not up_job.id:
-                    self._run(up_job)
+                    await self._run(up_job)
                 up_ids.append(up_job.id)
             node.submit(up_ids)
 
@@ -146,4 +138,7 @@ class DAG:
         ax.axes.xaxis.set_visible(False)
         ax.axes.yaxis.set_visible(False)
         plt.grid(True)
-        plt.show()
+        if get_backend() == 'agg':
+            plt.savefig(f'{self.name}_DAG_visualization.png')
+        else:
+            plt.show()
