@@ -53,7 +53,8 @@ class Job():
         return f'{self.name}'
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.name}, {self.script}, {self.dag})'
+        return f'{self.__class__.__name__}({self.name}, {self.script}, \
+        {self.dag})'
     # def __repr__(self) -> str:
     #     return f' Name: {self.name}, Script: {self.script}, ID: {self.id},
     #  Upstream: {self.upstream_jobs}, Downstream: {self.downstream_jobs}'

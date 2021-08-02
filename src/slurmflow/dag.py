@@ -29,7 +29,6 @@ class DAG:
         else:
             self.env = {}
 
-
     @property
     def source(self) -> 'Job':
         return [n for n, d in self.graph.in_degree() if d == 0]
