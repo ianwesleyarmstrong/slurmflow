@@ -5,7 +5,7 @@ from typing import List
 _CONTEXT_MANAGER_DAG = None
 
 
-class Job():
+class Job:
 
     def __init__(self, name: str, script: str, dag: DAG = None) -> None:
         self.name = name
