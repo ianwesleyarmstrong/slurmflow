@@ -35,7 +35,7 @@ class DAG:
 
     @property
     def sink(self) -> 'Job':
-        return [n for n, d in self.graph.out_degree() if d == 0][0]
+        return [n for n, d in self.graph.out_degree() if d == 0]
 
     def __str__(self) -> str:
         return f'{self.name}'
