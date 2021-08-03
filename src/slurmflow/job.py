@@ -1,5 +1,5 @@
 import subprocess
-from dag import DAG
+from .dag import DAG
 from typing import List
 
 _CONTEXT_MANAGER_DAG = None
