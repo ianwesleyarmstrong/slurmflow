@@ -1,5 +1,5 @@
 import subprocess
-from .dag import DAG
+from dag import DAG
 from typing import List
 
 _CONTEXT_MANAGER_DAG = None
@@ -26,11 +26,9 @@ class Job:
         return set(self._dag.graph.predecessors(self))
 
     def set_downstream(self, downstream) -> None:
-        # print(self.name, downstream)
         self._dag.set_children(self, downstream)
 
     def set_upstream(self, upstream) -> None:
-        # print(self.name, upstream)
         self._dag.set_parents(self, upstream)
 
     def __lshift__(self, other) -> None:
@@ -55,9 +53,6 @@ class Job:
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.name}, {self.script}, \
         {self.dag})'
-    # def __repr__(self) -> str:
-    #     return f' Name: {self.name}, Script: {self.script}, ID: {self.id},
-    #  Upstream: {self.upstream_jobs}, Downstream: {self.downstream_jobs}'
 
     def submit(self, upstream_ids: List[str] = None) -> str:
         command = ['sbatch', f'--job-name={self.name}', self.script]
