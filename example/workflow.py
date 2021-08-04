@@ -4,7 +4,7 @@ from slurmflow import DAG
 env = {
     'BEOCAT_DATA_DIR': '/bulk/${USER}',
     'BEOCAT_SAM_DIR': '/bulk/${USER}/sam',
-    'BEOCAT_BAM_DIR': '/bulk/kwjordan/bam'
+    'BEOCAT_BAM_DIR': '/bulk/${USER}/bam'
 }
 
 with DAG('simple_slurm_workflow', env=env) as d:

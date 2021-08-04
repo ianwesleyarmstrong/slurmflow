@@ -55,7 +55,7 @@ class Job:
         {self.dag})'
 
     def submit(self, upstream_ids: List[str] = None) -> str:
-        command = ['sbatch', f'--job-name={self.name}', self.script]
+        command = ['sbatch', f'--job-name={self.name}']
         if upstream_ids:
             slurm_dependency = '--dependency=afterok:' + ':'.join(upstream_ids)
             command.append(slurm_dependency)
@@ -64,6 +64,8 @@ class Job:
             env_vars = [f'{k}={v}' for k, v in self._dag.env.items()]
             env_export = env_flag + ','.join(env_vars)
             command.append(env_export)
+        # script has to come last in order for environment variables to pass
+        command.append(self.script)
         command_str = ' '.join(command)
         print(f'Sbatch command: {command_str}')
         p = subprocess.Popen(command, stdout=subprocess.PIPE,
