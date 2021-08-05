@@ -26,12 +26,12 @@ class TestDAG(unittest.TestCase):
     def test_source_property(self):
         jobs, dag = self.generate_dag()
         # source can potentially return a list, so we grab the first element
-        self.assertEqual(jobs[1], dag.source[0])
+        self.assertEqual(jobs[1], dag.source)
 
     def test_sink_property(self):
         jobs, dag = self.generate_dag()
         # source can potentially return a list, so we grab the first element
-        self.assertEqual(jobs[-1], dag.sink[0])
+        self.assertEqual(jobs[-1], dag.sink)
 
 
 if __name__ == '__main__':
