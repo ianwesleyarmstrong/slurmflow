@@ -1,6 +1,6 @@
 import unittest
-from slurmflow.dag import DAG
-from slurmflow.job import Job
+from src.slurmflow.dag import DAG
+from src.slurmflow.job import Job
 
 
 class TestDAG(unittest.TestCase):
