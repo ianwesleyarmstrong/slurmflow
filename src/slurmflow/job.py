@@ -52,7 +52,7 @@ class Job:
 
     def __repr__(self) -> str:
         return f'{self.__class__.__name__}({self.name}, {self.script}, \
-        {self.dag})'
+        {self._dag})'
 
     def submit(self, upstream_ids: List[str] = None) -> str:
         command = ['sbatch', f'--job-name={self.name}']
