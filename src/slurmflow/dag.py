@@ -31,11 +31,11 @@ class DAG:
 
     @property
     def source(self) -> 'Job':
-        return [n for n, d in self.graph.in_degree_iter() if d == 0]
+        return [n for n, d in self.graph.in_degree() if d == 0]
 
     @property
     def sink(self) -> 'Job':
-        return [n for n, d in self.graph.out_degree_iter() if d == 0]
+        return [n for n, d in self.graph.out_degree() if d == 0]
 
     def __str__(self) -> str:
         return f'{self.name}'
