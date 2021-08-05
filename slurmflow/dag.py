@@ -35,13 +35,13 @@ class DAG:
 
     @property
     def sink(self) -> 'Job':
-        return [n for n, d in self.graph.out_degree() if d == 0][0]
+        return [n for n, d in self.graph.out_degree() if d == 0]
 
     def __str__(self) -> str:
         return f'{self.name}'
 
     def __repr__(self) -> str:
-        return f'{self.__class__.__name__}({self.name}, {self.env}  )'
+        return f'{self.__class__.__name__}({self.name}, {self.env})'
 
     def __enter__(self):
         # insipired by airflow's implementation
@@ -107,7 +107,6 @@ class DAG:
 
     def _create_dag_positions(self):
         levels = self._find_paths()
-        # print(levels)
         level_counts = Counter(levels.values())
         level_decrement = level_counts.copy()
         pos_mapping = dict()
@@ -123,7 +122,6 @@ class DAG:
                 cur = level_decrement[v]
                 scaled_val = arr[cur]
                 pos_mapping[k] = (v, scaled_val)
-        # print(pos_mapping)
         return pos_mapping
 
     def plot(self) -> None:
